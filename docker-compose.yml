@@ -1,0 +1,15 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: cafe-pos-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: cafe_pos
+    ports:
+      - "3306:3306"
+    volumes:
+      - cafe_pos_mysql:/var/lib/mysql
+
+volumes:
+  cafe_pos_mysql:

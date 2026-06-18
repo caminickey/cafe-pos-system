@@ -1,0 +1,108 @@
+<main class="shell">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Cafe POS</p>
+      <h1>Counter service</h1>
+    </div>
+    <div class="status">
+      <span>{{ openOrders.length }} open</span>
+      <span *ngIf="message">{{ message }}</span>
+    </div>
+  </header>
+
+  <section class="layout">
+    <aside class="orders">
+      <h2>Open tables</h2>
+      <button class="order-pill" *ngFor="let order of openOrders" (click)="selectOrder(order)" [class.active]="currentOrder?.id === order.id">
+        <span>#{{ order.id }} {{ order.tableName }}</span>
+        <strong>RM {{ order.balanceDue | number:'1.2-2' }}</strong>
+      </button>
+      <p class="empty" *ngIf="!openOrders.length">No open orders yet.</p>
+    </aside>
+
+    <section class="menu">
+      <div class="section-title">
+        <h2>Menu</h2>
+        <input [(ngModel)]="tableName" placeholder="Table name">
+      </div>
+      <div class="category" *ngFor="let category of categories()">
+        <h3>{{ category }}</h3>
+        <div class="menu-grid">
+          <button class="menu-item" *ngFor="let item of byCategory(category)" (click)="addItemToOrder(item)">
+            <span>{{ item.name }}</span>
+            <small>{{ item.description }}</small>
+            <strong>RM {{ item.price | number:'1.2-2' }}</strong>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="ticket">
+      <div class="section-title">
+        <h2>{{ currentOrder ? 'Order #' + currentOrder.id : 'New cart' }}</h2>
+        <button [disabled]="busy || !cart.length" *ngIf="!currentOrder" (click)="createOrder()">Send order</button>
+      </div>
+
+      <div *ngIf="!currentOrder" class="cart-lines">
+        <div class="line" *ngFor="let line of cart; let i = index">
+          <div>
+            <strong>{{ line.item.name }}</strong>
+            <input [(ngModel)]="line.modifiers" placeholder="modifier, e.g. oat milk">
+          </div>
+          <input class="qty" type="number" min="1" [(ngModel)]="line.quantity">
+          <button class="ghost" (click)="removeCartLine(i)">Remove</button>
+        </div>
+        <div class="total">Cart subtotal <strong>RM {{ cartTotal() | number:'1.2-2' }}</strong></div>
+      </div>
+
+      <div *ngIf="currentOrder" class="order-panel">
+        <div class="line" *ngFor="let line of currentOrder.lines" [class.voided]="line.status === 'VOIDED'">
+          <div>
+            <strong>{{ line.itemName }}</strong>
+            <input [ngModel]="line.modifiers" #mods placeholder="modifier">
+          </div>
+          <input class="qty" type="number" min="1" [ngModel]="line.quantity" #qty>
+          <button class="ghost" (click)="updateLine(line.id, +qty.value, mods.value)">Update</button>
+          <button class="ghost danger" (click)="voidLine(line.id)">Void</button>
+        </div>
+
+        <textarea #note [ngModel]="currentOrder.note" placeholder="Kitchen note: allergies, timing, special requests"></textarea>
+        <button class="wide" (click)="saveNote(note.value)">Save note</button>
+
+        <div class="totals">
+          <span>Subtotal <strong>RM {{ currentOrder.subtotal | number:'1.2-2' }}</strong></span>
+          <span>Service tax 6% <strong>RM {{ currentOrder.serviceTax | number:'1.2-2' }}</strong></span>
+          <span>Total <strong>RM {{ currentOrder.total | number:'1.2-2' }}</strong></span>
+          <span>Paid <strong>RM {{ currentOrder.paidAmount | number:'1.2-2' }}</strong></span>
+          <span class="due">Balance <strong>RM {{ currentOrder.balanceDue | number:'1.2-2' }}</strong></span>
+        </div>
+
+        <div class="payment">
+          <h3>Split and payment</h3>
+          <div class="row">
+            <input type="number" min="2" [(ngModel)]="people">
+            <button (click)="previewSplit()">Split bill</button>
+          </div>
+          <p *ngIf="split">Each pays RM {{ split.eachPays | number:'1.2-2' }} from RM {{ split.remainingBalance | number:'1.2-2' }}</p>
+          <input [(ngModel)]="payerName" placeholder="Payer name">
+          <select [(ngModel)]="paymentMethod">
+            <option value="CARD">Card</option>
+            <option value="CASH">Cash</option>
+            <option value="EWALLET">E-wallet</option>
+          </select>
+          <input type="number" min="0" step="0.01" [(ngModel)]="paymentAmount">
+          <button class="wide pay" [disabled]="busy || currentOrder.status === 'PAID'" (click)="pay()">Record payment</button>
+        </div>
+      </div>
+
+      <div class="ai">
+        <h3>AI helper</h3>
+        <div class="row">
+          <button (click)="suggestAddOn()">Suggest add-on</button>
+          <button [disabled]="!currentOrder" (click)="kitchenSummary()">Kitchen summary</button>
+        </div>
+        <p>{{ aiText || 'Gemini suggestions will appear here when GEMINI_API_KEY is configured.' }}</p>
+      </div>
+    </section>
+  </section>
+</main>

@@ -56,7 +56,7 @@ h2 {
 .status span,
 .order-pill,
 .menu-item {
-  color: #ffffff;
+  color: #000000;
 }
 .ticket,
 .orders {
@@ -93,7 +93,7 @@ h2 {
 }
 
 .order-pill.active {
-  outline: 2px solid #2f6f60;
+  outline: 2px solid #b4a7ff;
 }
 
 .menu {

@@ -55,7 +55,9 @@ h2 {
 
 .status span,
 .order-pill,
-.menu-item,
+.menu-item {
+  color: #20201d;
+}
 .ticket,
 .orders {
   border: 1px solid #ddd6c8;

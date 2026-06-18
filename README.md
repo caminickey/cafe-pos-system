@@ -47,7 +47,7 @@ DB_URL=jdbc:mysql://localhost:3306/cafe_pos?createDatabaseIfNotExist=true&useSSL
 DB_USER=root
 DB_PASSWORD=password
 CORS_ALLOWED_ORIGIN=http://localhost:4200
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY=AQ.Ab8RN6Ktu0VsOzF5m9hdBMopVJPZXlMLLn2iTMepqk7DZE5e1Q
 GEMINI_MODEL=gemini-1.5-flash
 ```
 
